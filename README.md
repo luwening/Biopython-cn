@@ -5,7 +5,7 @@ Biopython 中文翻译
 
 翻译格式采用rst，文档统一采用utf-8编码。  
 
-Biopython文档的版本基于Last Update – 5 22 March 2013 (Biopython 1.61 +)  
+Biopython文档的版本基于Last Update – 22 March 2013 (Biopython 1.61 +)  
 
 QQ交流群为163391156，新进来的童鞋请在群里或者群邮件中确认你想翻译的章节。
 
