@@ -1,0 +1,379 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Chapter 10 Swiss-Prot and ExPASy &mdash; Biopython_en 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Biopython_en 1.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Biopython_en 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="chapter-10-swiss-prot-and-expasy">
+<h1>Chapter 10  Swiss-Prot and ExPASy<a class="headerlink" href="#chapter-10-swiss-prot-and-expasy" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="parsing-swiss-prot-files">
+<h2>10.1  Parsing Swiss-Prot files<a class="headerlink" href="#parsing-swiss-prot-files" title="Permalink to this headline">¶</a></h2>
+<p>Swiss-Prot
+(<tt class="docutils literal"><span class="pre">`http://www.expasy.org/sprot</span></tt> &lt;<a class="reference external" href="http://www.expasy.org/sprot">http://www.expasy.org/sprot</a>&gt;`__) is a
+hand-curated database of protein sequences. Biopython can parse the
+“plain text” Swiss-Prot file format, which is still used for the UniProt
+Knowledgebase which combined Swiss-Prot, TrEMBL and PIR-PSD. We do not
+(yet) support the UniProtKB XML file format.</p>
+<div class="section" id="parsing-swiss-prot-records">
+<h3>10.1.1  Parsing Swiss-Prot records<a class="headerlink" href="#parsing-swiss-prot-records" title="Permalink to this headline">¶</a></h3>
+<p>In Section <a class="reference external" href="#sec:SeqIO_ExPASy_and_SwissProt">5.3.2</a>, we described
+how to extract the sequence of a Swiss-Prot record as a <tt class="docutils literal"><span class="pre">SeqRecord</span></tt>
+object. Alternatively, you can store the Swiss-Prot record in a
+<tt class="docutils literal"><span class="pre">Bio.SwissProt.Record</span></tt> object, which in fact stores the complete
+information contained in the Swiss-Prot record. In this Section, we
+describe how to extract <tt class="docutils literal"><span class="pre">Bio.SwissProt.Record</span></tt> objects from a
+Swiss-Prot file.</p>
+<p>To parse a Swiss-Prot record, we first get a handle to a Swiss-Prot
+record. There are several ways to do so, depending on where and how the
+Swiss-Prot record is stored:</p>
+<ul>
+<li><dl class="first docutils">
+<dt>Open a Swiss-Prot file locally:</dt>
+<dd><p class="first last"><tt class="docutils literal"><span class="pre">&gt;&gt;&gt;</span> <span class="pre">handle</span> <span class="pre">=</span> <span class="pre">open(&quot;myswissprotfile.dat&quot;)</span></tt></p>
+</dd>
+</dl>
+</li>
+<li><p class="first">Open a gzipped Swiss-Prot file:</p>
+</li>
+<li><p class="first">Open a Swiss-Prot file over the internet:</p>
+</li>
+<li><p class="first">Open a Swiss-Prot file over the internet from the ExPASy database
+(see section <a class="reference external" href="#subsec:expasy_swissprot">10.5.1</a>):</p>
+</li>
+</ul>
+<p>The key point is that for the parser, it doesn’t matter how the handle
+was created, as long as it points to data in the Swiss-Prot format.</p>
+<p>We can use <tt class="docutils literal"><span class="pre">Bio.SeqIO</span></tt> as described in
+Section <a class="reference external" href="#sec:SeqIO_ExPASy_and_SwissProt">5.3.2</a> to get file format
+agnostic <tt class="docutils literal"><span class="pre">SeqRecord</span></tt> objects. Alternatively, we can use
+<tt class="docutils literal"><span class="pre">Bio.SwissProt</span></tt> get <tt class="docutils literal"><span class="pre">Bio.SwissProt.Record</span></tt> objects, which are a much
+closer match to the underlying file format.</p>
+<p>To read one Swiss-Prot record from the handle, we use the function
+<tt class="docutils literal"><span class="pre">read()</span></tt>:</p>
+<p>This function should be used if the handle points to exactly one
+Swiss-Prot record. It raises a <tt class="docutils literal"><span class="pre">ValueError</span></tt> if no Swiss-Prot record
+was found, and also if more than one record was found.</p>
+<p>We can now print out some information about this record:</p>
+<p>To parse a file that contains more than one Swiss-Prot record, we use
+the <tt class="docutils literal"><span class="pre">parse</span></tt> function instead. This function allows us to iterate over
+the records in the file.</p>
+<p>For example, let’s parse the full Swiss-Prot database and collect all
+the descriptions. You can download this from the <a class="reference external" href="ftp://ftp.expasy.org/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.dat.gz">ExPAYs FTP
+site</a>
+as a single gzipped-file <tt class="docutils literal"><span class="pre">uniprot_sprot.dat.gz</span></tt> (about 300MB). This is
+a compressed file containing a single file, <tt class="docutils literal"><span class="pre">uniprot_sprot.dat</span></tt> (over
+1.5GB).</p>
+<p>As described at the start of this section, you can use the Python
+library <tt class="docutils literal"><span class="pre">gzip</span></tt> to open and uncompress a <tt class="docutils literal"><span class="pre">.gz</span></tt> file, like this:</p>
+<p>However, uncompressing a large file takes time, and each time you open
+the file for reading in this way, it has to be decompressed on the fly.
+So, if you can spare the disk space you’ll save time in the long run if
+you first decompress the file to disk, to get the <tt class="docutils literal"><span class="pre">uniprot_sprot.dat</span></tt>
+file inside. Then you can open the file for reading as usual:</p>
+<p>As of June 2009, the full Swiss-Prot database downloaded from ExPASy
+contained 468851 Swiss-Prot records. One concise way to build up a list
+of the record descriptions is with a list comprehension:</p>
+<p>Or, using a for loop over the record iterator:</p>
+<p>Because this is such a large input file, either way takes about eleven
+minutes on my new desktop computer (using the uncompressed
+<tt class="docutils literal"><span class="pre">uniprot_sprot.dat</span></tt> file as input).</p>
+<p>It is equally easy to extract any kind of information you’d like from
+Swiss-Prot records. To see the members of a Swiss-Prot record, use</p>
+</div>
+<div class="section" id="parsing-the-swiss-prot-keyword-and-category-list">
+<h3>10.1.2  Parsing the Swiss-Prot keyword and category list<a class="headerlink" href="#parsing-the-swiss-prot-keyword-and-category-list" title="Permalink to this headline">¶</a></h3>
+<p>Swiss-Prot also distributes a file <tt class="docutils literal"><span class="pre">keywlist.txt</span></tt>, which lists the
+keywords and categories used in Swiss-Prot. The file contains entries in
+the following form:</p>
+<p>The entries in this file can be parsed by the <tt class="docutils literal"><span class="pre">parse</span></tt> function in the
+<tt class="docutils literal"><span class="pre">Bio.SwissProt.KeyWList</span></tt> module. Each entry is then stored as a
+<tt class="docutils literal"><span class="pre">Bio.SwissProt.KeyWList.Record</span></tt>, which is a Python dictionary.</p>
+<p>This prints</p>
+</div>
+</div>
+<div class="section" id="parsing-prosite-records">
+<h2>10.2  Parsing Prosite records<a class="headerlink" href="#parsing-prosite-records" title="Permalink to this headline">¶</a></h2>
+<p>Prosite is a database containing protein domains, protein families,
+functional sites, as well as the patterns and profiles to recognize
+them. Prosite was developed in parallel with Swiss-Prot. In Biopython, a
+Prosite record is represented by the <tt class="docutils literal"><span class="pre">Bio.ExPASy.Prosite.Record</span></tt>
+class, whose members correspond to the different fields in a Prosite
+record.</p>
+<p>In general, a Prosite file can contain more than one Prosite records.
+For example, the full set of Prosite records, which can be downloaded as
+a single file (<tt class="docutils literal"><span class="pre">prosite.dat</span></tt>) from the <a class="reference external" href="ftp://ftp.expasy.org/databases/prosite/prosite.dat">ExPASy FTP
+site</a>, contains
+2073 records (version 20.24 released on 4 December 2007). To parse such
+a file, we again make use of an iterator:</p>
+<p>We can now take the records one at a time and print out some
+information. For example, using the file containing the complete Prosite
+database, we’d find</p>
+<p>and so on. If you’re interested in how many Prosite records there are,
+you could use</p>
+<p>To read exactly one Prosite from the handle, you can use the <tt class="docutils literal"><span class="pre">read</span></tt>
+function:</p>
+<p>This function raises a ValueError if no Prosite record is found, and
+also if more than one Prosite record is found.</p>
+</div>
+<div class="section" id="parsing-prosite-documentation-records">
+<h2>10.3  Parsing Prosite documentation records<a class="headerlink" href="#parsing-prosite-documentation-records" title="Permalink to this headline">¶</a></h2>
+<p>In the Prosite example above, the <tt class="docutils literal"><span class="pre">record.pdoc</span></tt> accession numbers
+<tt class="docutils literal"><span class="pre">'PDOC00001'</span></tt>, <tt class="docutils literal"><span class="pre">'PDOC00004'</span></tt>, <tt class="docutils literal"><span class="pre">'PDOC00005'</span></tt> and so on refer to
+Prosite documentation. The Prosite documentation records are available
+from ExPASy as individual files, and as one file (<tt class="docutils literal"><span class="pre">prosite.doc</span></tt>)
+containing all Prosite documentation records.</p>
+<p>We use the parser in <tt class="docutils literal"><span class="pre">Bio.ExPASy.Prodoc</span></tt> to parse Prosite
+documentation records. For example, to create a list of all accession
+numbers of Prosite documentation record, you can use</p>
+<p>Again a <tt class="docutils literal"><span class="pre">read()</span></tt> function is provided to read exactly one Prosite
+documentation record from the handle.</p>
+</div>
+<div class="section" id="parsing-enzyme-records">
+<h2>10.4  Parsing Enzyme records<a class="headerlink" href="#parsing-enzyme-records" title="Permalink to this headline">¶</a></h2>
+<p>ExPASy’s Enzyme database is a repository of information on enzyme
+nomenclature. A typical Enzyme record looks as follows:</p>
+<p>In this example, the first line shows the EC (Enzyme Commission) number
+of lipoprotein lipase (second line). Alternative names of lipoprotein
+lipase are &#8220;clearing factor lipase&#8221;, &#8220;diacylglycerol lipase&#8221;, and
+&#8220;diglyceride lipase&#8221; (lines 3 through 5). The line starting with &#8220;CA&#8221;
+shows the catalytic activity of this enzyme. Comment lines start with
+&#8220;CC&#8221;. The &#8220;PR&#8221; line shows references to the Prosite Documentation
+records, and the &#8220;DR&#8221; lines show references to Swiss-Prot records. Not
+of these entries are necessarily present in an Enzyme record.</p>
+<p>In Biopython, an Enzyme record is represented by the
+<tt class="docutils literal"><span class="pre">Bio.ExPASy.Enzyme.Record</span></tt> class. This record derives from a Python
+dictionary and has keys corresponding to the two-letter codes used in
+Enzyme files. To read an Enzyme file containing one Enzyme record, use
+the <tt class="docutils literal"><span class="pre">read</span></tt> function in <tt class="docutils literal"><span class="pre">Bio.ExPASy.Enzyme</span></tt>:</p>
+<p>The <tt class="docutils literal"><span class="pre">read</span></tt> function raises a ValueError if no Enzyme record is found,
+and also if more than one Enzyme record is found.</p>
+<p>The full set of Enzyme records can be downloaded as a single file
+(<tt class="docutils literal"><span class="pre">enzyme.dat</span></tt>) from the <a class="reference external" href="ftp://ftp.expasy.org/databases/enzyme/enzyme.dat">ExPASy FTP
+site</a>, containing
+4877 records (release of 3 March 2009). To parse such a file containing
+multiple Enzyme records, use the <tt class="docutils literal"><span class="pre">parse</span></tt> function in
+<tt class="docutils literal"><span class="pre">Bio.ExPASy.Enzyme</span></tt> to obtain an iterator:</p>
+<p>We can now iterate over the records one at a time. For example, we can
+make a list of all EC numbers for which an Enzyme record is available:</p>
+</div>
+<div class="section" id="accessing-the-expasy-server">
+<h2>10.5  Accessing the ExPASy server<a class="headerlink" href="#accessing-the-expasy-server" title="Permalink to this headline">¶</a></h2>
+<p>Swiss-Prot, Prosite, and Prosite documentation records can be downloaded
+from the ExPASy web server at
+<tt class="docutils literal"><span class="pre">`http://www.expasy.org</span></tt> &lt;<a class="reference external" href="http://www.expasy.org">http://www.expasy.org</a>&gt;`__. Six kinds of
+queries are available from ExPASy:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt><strong>get_prodoc_entry</strong></dt>
+<dd>To download a Prosite documentation record in HTML format</dd>
+</dl>
+</div></blockquote>
+<dl class="docutils">
+<dt><strong>get_prosite_entry</strong></dt>
+<dd>To download a Prosite record in HTML format</dd>
+<dt><strong>get_prosite_raw</strong></dt>
+<dd>To download a Prosite or Prosite documentation record in raw format</dd>
+<dt><strong>get_sprot_raw</strong></dt>
+<dd>To download a Swiss-Prot record in raw format</dd>
+<dt><strong>sprot_search_ful</strong></dt>
+<dd>To search for a Swiss-Prot record</dd>
+<dt><strong>sprot_search_de</strong></dt>
+<dd>To search for a Swiss-Prot record</dd>
+</dl>
+<p>To access this web server from a Python script, we use the
+<tt class="docutils literal"><span class="pre">Bio.ExPASy</span></tt> module.</p>
+<div class="section" id="retrieving-a-swiss-prot-record">
+<h3>10.5.1  Retrieving a Swiss-Prot record<a class="headerlink" href="#retrieving-a-swiss-prot-record" title="Permalink to this headline">¶</a></h3>
+<p>Let’s say we are looking at chalcone synthases for Orchids (see
+section <a class="reference external" href="#sec:orchids">2.3</a> for some justification for looking for
+interesting things about orchids). Chalcone synthase is involved in
+flavanoid biosynthesis in plants, and flavanoids make lots of cool
+things like pigment colors and UV protectants.</p>
+<p>If you do a search on Swiss-Prot, you can find three orchid proteins for
+Chalcone Synthase, id numbers O23729, O23730, O23731. Now, let’s write a
+script which grabs these, and parses out some interesting information.</p>
+<p>First, we grab the records, using the <tt class="docutils literal"><span class="pre">get_sprot_raw()</span></tt> function of
+<tt class="docutils literal"><span class="pre">Bio.ExPASy</span></tt>. This function is very nice since you can feed it an id
+and get back a handle to a raw text record (no html to mess with!). We
+can the use <tt class="docutils literal"><span class="pre">Bio.SwissProt.read</span></tt> to pull out the Swiss-Prot record, or
+<tt class="docutils literal"><span class="pre">Bio.SeqIO.read</span></tt> to get a SeqRecord. The following code accomplishes
+what I just wrote:</p>
+<p>If the accession number you provided to <tt class="docutils literal"><span class="pre">ExPASy.get_sprot_raw</span></tt> does
+not exist, then <tt class="docutils literal"><span class="pre">SwissProt.read(handle)</span></tt> will raise a <tt class="docutils literal"><span class="pre">ValueError</span></tt>.
+You can catch <tt class="docutils literal"><span class="pre">ValueException</span></tt> exceptions to detect invalid accession
+numbers:</p>
+</div>
+<div class="section" id="searching-swiss-prot">
+<h3>10.5.2  Searching Swiss-Prot<a class="headerlink" href="#searching-swiss-prot" title="Permalink to this headline">¶</a></h3>
+<p>Now, you may remark that I knew the records’ accession numbers
+beforehand. Indeed, <tt class="docutils literal"><span class="pre">get_sprot_raw()</span></tt> needs either the entry name or
+an accession number. When you don’t have them handy, you can use one of
+the <tt class="docutils literal"><span class="pre">sprot_search_de()</span></tt> or <tt class="docutils literal"><span class="pre">sprot_search_ful()</span></tt> functions.</p>
+<p><tt class="docutils literal"><span class="pre">sprot_search_de()</span></tt> searches in the ID, DE, GN, OS and OG lines;
+<tt class="docutils literal"><span class="pre">sprot_search_ful()</span></tt> searches in (nearly) all the fields. They are
+detailed on
+<tt class="docutils literal"><span class="pre">`http://www.expasy.org/cgi-bin/sprot-search-de</span></tt> &lt;<a class="reference external" href="http://www.expasy.org/cgi-bin/sprot-search-de">http://www.expasy.org/cgi-bin/sprot-search-de</a>&gt;`__
+and
+<tt class="docutils literal"><span class="pre">`http://www.expasy.org/cgi-bin/sprot-search-ful</span></tt> &lt;<a class="reference external" href="http://www.expasy.org/cgi-bin/sprot-search-ful">http://www.expasy.org/cgi-bin/sprot-search-ful</a>&gt;`__
+respectively. Note that they don’t search in TrEMBL by default (argument
+<tt class="docutils literal"><span class="pre">trembl</span></tt>). Note also that they return html pages; however, accession
+numbers are quite easily extractable:</p>
+</div>
+<div class="section" id="retrieving-prosite-and-prosite-documentation-records">
+<h3>10.5.3  Retrieving Prosite and Prosite documentation records<a class="headerlink" href="#retrieving-prosite-and-prosite-documentation-records" title="Permalink to this headline">¶</a></h3>
+<p>Prosite and Prosite documentation records can be retrieved either in
+HTML format, or in raw format. To parse Prosite and Prosite
+documentation records with Biopython, you should retrieve the records in
+raw format. For other purposes, however, you may be interested in these
+records in HTML format.</p>
+<p>To retrieve a Prosite or Prosite documentation record in raw format, use
+<tt class="docutils literal"><span class="pre">get_prosite_raw()</span></tt>. For example, to download a Prosite record and
+print it out in raw text format, use</p>
+<p>To retrieve a Prosite record and parse it into a <tt class="docutils literal"><span class="pre">Bio.Prosite.Record</span></tt>
+object, use</p>
+<p>The same function can be used to retrieve a Prosite documentation record
+and parse it into a <tt class="docutils literal"><span class="pre">Bio.ExPASy.Prodoc.Record</span></tt> object:</p>
+<p>For non-existing accession numbers, <tt class="docutils literal"><span class="pre">ExPASy.get_prosite_raw</span></tt> returns a
+handle to an emptry string. When faced with an empty string,
+<tt class="docutils literal"><span class="pre">Prosite.read</span></tt> and <tt class="docutils literal"><span class="pre">Prodoc.read</span></tt> will raise a ValueError. You can
+catch these exceptions to detect invalid accession numbers.</p>
+<p>The functions <tt class="docutils literal"><span class="pre">get_prosite_entry()</span></tt> and <tt class="docutils literal"><span class="pre">get_prodoc_entry()</span></tt> are
+used to download Prosite and Prosite documentation records in HTML
+format. To create a web page showing one Prosite record, you can use</p>
+<p>and similarly for a Prosite documentation record:</p>
+<p>For these functions, an invalid accession number returns an error
+message in HTML format.</p>
+</div>
+</div>
+<div class="section" id="scanning-the-prosite-database">
+<h2>10.6  Scanning the Prosite database<a class="headerlink" href="#scanning-the-prosite-database" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://www.expasy.org/tools/scanprosite/">ScanProsite</a> allows you to
+scan protein sequences online against the Prosite database by providing
+a UniProt or PDB sequence identifier or the sequence itself. For more
+information about ScanProsite, please see the <a class="reference external" href="http://www.expasy.org/tools/scanprosite/scanprosite-doc.html">ScanProsite
+documentation</a>
+as well as the <a class="reference external" href="http://www.expasy.org/tools/scanprosite/ScanPrositeREST.html">documentation for programmatic access of
+ScanProsite</a>.</p>
+<p>You can use Biopython’s <tt class="docutils literal"><span class="pre">Bio.ExPASy.ScanProsite</span></tt> module to scan the
+Prosite database from Python. This module both helps you to access
+ScanProsite programmatically, and to parse the results returned by
+ScanProsite. To scan for Prosite patterns in the following protein
+sequence:</p>
+<p>you can use the following code:</p>
+<p>By executing <tt class="docutils literal"><span class="pre">handle.read()</span></tt>, you can obtain the search results in raw
+XML format. Instead, let’s use <tt class="docutils literal"><span class="pre">Bio.ExPASy.ScanProsite.read</span></tt> to parse
+the raw XML into a Python object:</p>
+<p>A <tt class="docutils literal"><span class="pre">Bio.ExPASy.ScanProsite.Record</span></tt> object is derived from a list, with
+each element in the list storing one ScanProsite hit. This object also
+stores the number of hits, as well as the number of search sequences, as
+returned by ScanProsite. This ScanProsite search resulted in six hits:</p>
+<p>Other ScanProsite parameters can be passed as keyword arguments; see the
+<a class="reference external" href="http://www.expasy.org/tools/scanprosite/ScanPrositeREST.html">documentation for programmatic access of
+ScanProsite</a>
+for more information. As an example, passing <tt class="docutils literal"><span class="pre">lowscore=1</span></tt> to include
+matches with low level scores lets use find one additional hit:</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Chapter 10  Swiss-Prot and ExPASy</a><ul>
+<li><a class="reference internal" href="#parsing-swiss-prot-files">10.1  Parsing Swiss-Prot files</a><ul>
+<li><a class="reference internal" href="#parsing-swiss-prot-records">10.1.1  Parsing Swiss-Prot records</a></li>
+<li><a class="reference internal" href="#parsing-the-swiss-prot-keyword-and-category-list">10.1.2  Parsing the Swiss-Prot keyword and category list</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#parsing-prosite-records">10.2  Parsing Prosite records</a></li>
+<li><a class="reference internal" href="#parsing-prosite-documentation-records">10.3  Parsing Prosite documentation records</a></li>
+<li><a class="reference internal" href="#parsing-enzyme-records">10.4  Parsing Enzyme records</a></li>
+<li><a class="reference internal" href="#accessing-the-expasy-server">10.5  Accessing the ExPASy server</a><ul>
+<li><a class="reference internal" href="#retrieving-a-swiss-prot-record">10.5.1  Retrieving a Swiss-Prot record</a></li>
+<li><a class="reference internal" href="#searching-swiss-prot">10.5.2  Searching Swiss-Prot</a></li>
+<li><a class="reference internal" href="#retrieving-prosite-and-prosite-documentation-records">10.5.3  Retrieving Prosite and Prosite documentation records</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#scanning-the-prosite-database">10.6  Scanning the Prosite database</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/en/chr10.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Biopython_en 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Biopython.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

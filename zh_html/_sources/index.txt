@@ -1,0 +1,46 @@
+.. Biopython_en documentation master file, created by
+   sphinx-quickstart on Tue Aug 13 10:16:59 2013.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Welcome to Biopython_en's documentation!
+========================================
+
+Contents:
+
+.. toctree::
+   :maxdepth: 2
+
+    
+   chr1.rst
+   chr2.rst
+   chr3.rst
+   chr4.rst
+   chr5.rst
+   chr6.rst
+   chr7.rst
+   chr8.rst
+   chr9.rst
+   chr10.rst
+   chr11.rst
+   chr12.rst
+   chr13.rst
+   chr14.rst
+   chr15.rst
+   chr16.rst
+   chr17.rst
+   chr18.rst
+   chr19.rst
+   chr20.rst
+   chr21.rst
+   chr22.rst
+
+
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
