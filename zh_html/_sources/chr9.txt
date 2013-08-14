@@ -1,4 +1,4 @@
-﻿hapter 9  Accessing NCBI’s Entrez databases
+﻿Chapter 9  Accessing NCBI’s Entrez databases
 ============================================
 
 Entrez
